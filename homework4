@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int** create_matrix(int **matrix, int row, int col);
+int  free_matrix(int** matrix, int  row, int  col);
+void  print_matrix(int** matrix_a, int **matrix_b, int  row, int  col);
+int  fill_data(int  **matrix, int  row, int  col);
+int  transpose_matrix(int  **matrix, int  **matrix_t, int  row, int  col);
+int  addition_matrix(int  **matrix_a, int  **matrix_b, int  **matrix_sum, int  row, int  col);
+int  subtraction_matrix(int  **matrix_a, int  **matrix_b, int  **matrix_sub, int  row, int  col);
+int  multiply_matrix(int  **matrix_a, int  **matrix_t, int  **matrix_axt, int  row, int  col, int e);
+int **matrix_a2=NULL; //전역변수로 2중포인터 선언
+int **matrix_b2=NULL;
+int **matrix_t2=NULL;
+int **matrix_sum2=NULL;
+int **matrix_sub2=NULL;
+int **matrix_axt2=NULL;
+
+int main(void) {
+
+	int row, col; //행과 열 변수 선언
+
+	printf("[-----[신주영] [2019038044]-----]\n");
+	printf("행렬의 행(row)과 열(column)의 값을 입력하세요: ");
+	scanf("%d%d", &row, &col); //사용자로부터 행과 열 값을 입력받음
+
+	matrix_a2 = create_matrix(matrix_a2, row, col); //각 배열을 동적 할당하여 공간을 생성
+	matrix_b2 = create_matrix(matrix_b2, row, col);
+	matrix_t2 = create_matrix(matrix_t2, row, col);
+	matrix_sum2 = create_matrix(matrix_sum2, row, col);
+	matrix_sub2 = create_matrix(matrix_sub2, row, col);
+	matrix_axt2 = create_matrix(matrix_axt2, row, col);
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			matrix_a2[i][j] = fill_data(matrix_a2, i, j);
+	} //배열A의 성분을 랜덤값으로 채움
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			matrix_b2[i][j] = fill_data(matrix_b2, i, j);
+	} //배열B의 성분을 랜덤값으로 채움
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			matrix_sum2[i][j] = addition_matrix(matrix_a2, matrix_b2, matrix_sum2, i, j);
+	} //A+B의 각 성분들을 함수호출을 통해서 저장
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			matrix_sub2[i][j] = subtraction_matrix(matrix_a2, matrix_b2, matrix_sub2, i, j);
+	} //A-B의 각 성분들을 함수호출을 통해서 저장
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			matrix_t2[i][j] = transpose_matrix(matrix_a2, matrix_t2, i, j);
+	} //A의 전치행렬 T의 성분들을 저장
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++) {
+			for (int e = 0; e < col; e++) //A의 행과 T의 열을 곱해서 더해야 하므로 3중 반복문
+				matrix_axt2[i][j] = multiply_matrix(matrix_a2, matrix_t2, matrix_axt2, i, j, e);
+		}
+	} //AxT의 성분들을 저장
+
+	print_matrix(matrix_a2, matrix_b2, row, col); //결과 출력
+
+	free_matrix(matrix_a2, row, col); //배열 공간 해제
+	free_matrix(matrix_b2, row, col);
+}
+
+int** create_matrix(int **matrix, int row, int col) //행렬을 동적메모리 할당 방식으로 생성
+{
+	if (row <= 0 || col <= 0) { //행과 열값이 0보다 작은 경우
+		printf("행과 열의 값을 확인하세요.\n");
+		return NULL; //NULL리턴
+	}
+	else { //행과 열값 모두 0보다 클 경우
+		matrix = (int **)malloc(row * sizeof(int)); //인수로 받은배열을 동적할당 해줌
+		for (int i = 0; i < col; i++)
+			matrix[i] = (int*)malloc(col * sizeof(int)); //2차원배열이므로 2번 할당필요
+	}
+	return (int**)matrix;
+}
+
+int  fill_data(int **matrix, int  row, int  col) //행렬의 성분을 랜덤으로 생성한다
+{
+	srand((unsigned)time(NULL));
+	matrix[row][col] = rand() % 20; //0~19 숫자를 랜덤으로 행렬의 성분을 채움
+	return matrix[row][col]; //배열의 row, col번째 성분을 리턴
+}
+
+int  free_matrix(int** matrix, int  row, int  col)
+{ //메모리 해제
+	for (int i = 0; i < row; i++)
+		free(matrix[i]);
+	free(matrix); //2차원 배열이므로 두번 해제가 필요함
+
+	return 0;
+}
+
+void  print_matrix(int** matrix_a, int **matrix_b, int  row, int  col)
+{ //결과값 출력
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			printf("%5d", matrix_sum2[i][j]); //A+B 출력
+		printf("\n");
+	}
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			printf("%5d", matrix_sub2[i][j]); //A-B 출력
+		printf("\n");
+	}
+
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++)
+			printf("%5d", matrix_axt2[i][j]); //AxT 출력
+		printf("\n");
+	}
+
+}
+
+int  transpose_matrix(int  **matrix_a, int  **matrix_t, int  row, int  col)
+{ //행렬 A의 전치행렬 T를 구현
+
+	matrix_t2[row][col] = matrix_a2[col][row]; //A의 행과 열을 바꾼것이 전치행렬T
+	return matrix_t2[row][col];
+
+}
+
+int  addition_matrix(int  **matrix_a, int  **matrix_b, int  **matrix_sum, int  row, int  col)
+{ //행렬 A+B를 구현
+
+	matrix_sum2[row][col] = (matrix_a2[row][col] + matrix_b2[row][col]); //A+B
+	return matrix_sum2[row][col];
+}
+
+int  subtraction_matrix(int  **matrix_a, int  **matrix_b, int  **matrix_sub, int  row, int  col)
+{ //행렬 A-B를 구현
+
+	matrix_sub2[row][col] = matrix_a2[row][col] - matrix_b2[row][col]; //A-B
+	return matrix_sub2[row][col];
+}
+
+int  multiply_matrix(int  **matrix_a, int  **matrix_t, int  **matrix_axt, int  row, int  col, int e)
+{ //행렬 A x T를 구현
+
+	matrix_axt2[row][col] = matrix_a2[row][e] * matrix_t2[e][col]; //각 A와 T의 성분들의을 곱함
+
+	return matrix_axt2[row][col];
+}
