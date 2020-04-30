@@ -44,6 +44,7 @@ int main()
 	headNode* headnode = NULL;
 
 	do {
+		printf("-----[신주영] [2019038044]-----\n");
 		printf("----------------------------------------------------------------\n");
 		printf("                     Singly Linked List       \n");
 		printf("----------------------------------------------------------------\n");
@@ -300,7 +301,6 @@ int invertList(headNode* h) {
 void printList(headNode* h) {
 	int i = 0;
 	listNode* p;
-
 	printf("\n---PRINT\n");
 
 	if (h == NULL) {
