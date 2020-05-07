@@ -29,7 +29,7 @@ typedef struct Head {
 
 /* note: initialize는 이중포인터를 매개변수로 받음
 		 singly-linked-list의 initialize와 차이점을 이해 할것 */
-headNode* initialize(headNode** h);
+int initialize(headNode** h);
 
 /* note: freeList는 싱글포인터를 매개변수로 받음
 		- initialize와 왜 다른지 이해 할것
@@ -70,7 +70,7 @@ int main()
 
 		switch (command) {
 		case 'z': case 'Z':
-			headnode=initialize(&headnode);
+			initialize(&headnode);
 			break;
 		case 'p': case 'P':
 			printList(headnode);
@@ -117,14 +117,12 @@ int main()
 	return 1;
 }
 
-
-headNode* initialize(headNode** h) { 
-	if (h != NULL) //헤드가 비어있지 않다면
+int initialize(headNode** h) { //headnode의 주소값을 받기위해 이중포인터 매개변수 이용
+	if (*h != NULL) //헤드가 비어있지 않다면
 		freeList(*h); //해제해줌
 
-		headNode* temp = (headNode*)malloc(sizeof(headNode)); //temp에 동적할당해준후
-		temp->first = NULL; //temp의 first를 NULL로 초기화
-		return temp; //temp의 주소 반환
+	*h = (headNode*)malloc(sizeof(headNode)); //headNode크기만큼 동적할당 해준다
+	(*h)->first = NULL; //헤드를 NULL로 초기화
 }
 
 int freeList(headNode* h) { //모든 노드를 해제
